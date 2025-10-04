@@ -24,11 +24,11 @@ export class MarketEventHandler extends BaseEventHandler {
     return context;
   }
 
-  getHoverStats(eventData) {
+  getHoverStats(eventData, t) {
     return {
-      'Start Age': eventData.params.startAge,
-      Duration: `${eventData.params.duration} years`,
-      'Return Adjustment': `${eventData.params.returnAdjustment}%`,
+      [t('hoverStats.marketEvent.startAge')]: eventData.params.startAge,
+      [t('hoverStats.marketEvent.duration')]: `${eventData.params.duration} ${t('years')}`,
+      [t('hoverStats.marketEvent.returnAdjustment')]: `${eventData.params.returnAdjustment}%`,
     };
   }
 }

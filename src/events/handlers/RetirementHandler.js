@@ -23,12 +23,12 @@ export class RetirementHandler extends FinancialPhaseHandler {
     return growth - withdrawal + pensionIncome;
   }
 
-  getHoverStats(eventData) {
+  getHoverStats(eventData, t) {
     return {
-      'Annual Withdrawal': eventData.params.annualWithdrawal,
-      'Withdrawal Rate': `${eventData.params.withdrawalRate}%`,
-      'Pension Income': eventData.params.pensionIncome,
-      'Investment Return': `${eventData.params.investmentReturn}%`,
+      [t('hoverStats.retirement.annualWithdrawal')]: eventData.params.annualWithdrawal,
+      [t('hoverStats.retirement.withdrawalRate')]: `${eventData.params.withdrawalRate}%`,
+      [t('hoverStats.retirement.pensionIncome')]: eventData.params.pensionIncome,
+      [t('hoverStats.retirement.investmentReturn')]: `${eventData.params.investmentReturn}%`,
     };
   }
 }

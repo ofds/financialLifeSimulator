@@ -18,7 +18,7 @@ class EventRegistry {
 
   getConfig(eventType) {
     const handler = this.handlers.get(eventType)
-    return handler ? handler.getTranslatedConfig() : null
+    return handler ? handler.config : null
   }
 }
 

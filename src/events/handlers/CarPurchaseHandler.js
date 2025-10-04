@@ -41,15 +41,15 @@ export class CarPurchaseHandler extends BaseEventHandler {
     return netWorth - annualPayment - annualInsurance - annualMaintenance + (carValue - (purchasePrice * Math.pow(1 - depreciationRate / 100, yearsSincePurchase -1)));
   }
 
-  getHoverStats(eventData, age) {
+  getHoverStats(eventData, age, t) {
     const yearsSince = Math.max(0, age - eventData.age);
     const currentValue = eventData.params.purchasePrice * Math.pow(1 - (eventData.params.depreciationRate || 15) / 100, yearsSince);
 
     return {
-      'Purchase Price': eventData.params.purchasePrice,
-      'Current Value': currentValue,
-      'Depreciation Rate': `${eventData.params.depreciationRate}%/year`,
-      'Years Owned': yearsSince,
+      [t('hoverStats.carPurchase.purchasePrice')]: eventData.params.purchasePrice,
+      [t('hoverStats.carPurchase.currentValue')]: currentValue,
+      [t('hoverStats.carPurchase.depreciationRate')]: `${eventData.params.depreciationRate}%/year`,
+      [t('hoverStats.carPurchase.yearsOwned')]: yearsSince,
     };
   }
 }

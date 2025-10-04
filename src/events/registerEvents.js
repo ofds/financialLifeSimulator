@@ -13,6 +13,7 @@ import { RetirementHandler, retirementConfig } from './handlers/RetirementHandle
 
 // Register all event handlers
 export function registerAllEvents() {
+  eventRegistry.handlers.clear(); // Clear existing handlers
   eventRegistry.register(
     financialPhaseConfig.type,
     new FinancialPhaseHandler(financialPhaseConfig)

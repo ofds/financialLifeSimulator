@@ -40,14 +40,14 @@ function App() {
         />
         
         <div className="flex-1 flex overflow-hidden">
-          <div className="w-[30%] min-w-[320px] max-w-[400px]">
+          <div className="w-[20%]">
             <InputSidebar 
               selectedInputType={selectedInputType}
               addEvent={addEvent}
             />
           </div>
           
-          <div className="flex-1 flex flex-col">
+          <div className="w-[70%] flex flex-col">
             <GraphArea 
               events={events}
               results={results}
@@ -63,7 +63,9 @@ function App() {
             />
           </div>
           
-          <StatsPanel />
+          <div className="w-[10%]">
+            <StatsPanel />
+          </div>
         </div>
         
         {/* Edit Modal */}

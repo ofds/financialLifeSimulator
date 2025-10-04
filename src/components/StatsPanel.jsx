@@ -8,7 +8,7 @@ const StatsPanel = memo(() => {
   
   if (!hoverInfo) {
     return (
-      <div className="w-80 bg-slate-800 border-l border-slate-700 p-6">
+      <div className="bg-slate-800 border-l border-slate-700 p-6">
         <h3 className="text-lg font-semibold text-slate-100 mb-4">Statistics</h3>
         <div className="text-center text-slate-400 mt-8">
           <p className="text-4xl mb-2">📈</p>

@@ -26,17 +26,17 @@ export class SideHustleHandler extends BaseEventHandler {
     return currentAnnualIncome;
   }
 
-  getHoverStats(eventData, age) {
+  getHoverStats(eventData, age, t) {
     const { monthlyIncome, growthRate, startDate, endDate } = eventData.params;
-    const status = age >= startDate && (!endDate || age <= endDate) ? 'Active' : 'Inactive';
+    const status = age >= startDate && (!endDate || age <= endDate) ? t('status.active') : t('status.inactive');
     const yearsActive = Math.max(0, age - startDate);
     const currentMonthlyIncome = monthlyIncome * Math.pow(1 + growthRate / 100, yearsActive);
 
     return {
-      'Starting Income': `${monthlyIncome}/month`,
-      'Current Income': `${currentMonthlyIncome.toFixed(2)}/month`,
-      'Growth Rate': `${growthRate}%/year`,
-      Status: status,
+      [t('hoverStats.sideHustle.startingIncome')]: `${monthlyIncome}/${t('month')}`,
+      [t('hoverStats.sideHustle.currentIncome')]: `${currentMonthlyIncome.toFixed(2)}/${t('month')}`,
+      [t('hoverStats.sideHustle.growthRate')]: `${growthRate}%/${t('year')}`,
+      [t('hoverStats.sideHustle.status')]: status,
     };
   }
 }

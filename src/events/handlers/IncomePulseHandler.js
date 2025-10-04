@@ -24,12 +24,12 @@ export class IncomePulseHandler extends BaseEventHandler {
     return netWorth + amount;
   }
 
-  getHoverStats(eventData, age) {
+  getHoverStats(eventData, age, t) {
     return {
-      'Income Amount': eventData.params.amount,
-      'Type': 'One-time payment',
-      'Impact Timing': 'Before growth calculation',
-      'Earns Returns': 'Yes, same year'
+      [t('hoverStats.incomePulse.incomeAmount')]: eventData.params.amount,
+      [t('hoverStats.incomePulse.type')]: t('hoverStats.incomePulse.typeValue'),
+      [t('hoverStats.incomePulse.impactTiming')]: t('hoverStats.incomePulse.impactTimingValue'),
+      [t('hoverStats.incomePulse.earnsReturns')]: t('hoverStats.incomePulse.earnsReturnsValue')
     }
   }
 }

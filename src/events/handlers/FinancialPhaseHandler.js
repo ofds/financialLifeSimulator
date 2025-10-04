@@ -53,11 +53,11 @@ export class FinancialPhaseHandler extends BaseEventHandler {
     return context
   }
 
-  getHoverStats(eventData, age) {
+  getHoverStats(eventData, age, t) {
     return {
-      'Annual Income': eventData.params.annualIncome,
-      'Savings Rate': `${eventData.params.savingsRate}%`,
-      'Investment Return': `${eventData.params.investmentReturn}%`
+      [t('hoverStats.financialPhase.annualIncome')]: eventData.params.annualIncome,
+      [t('hoverStats.financialPhase.savingsRate')]: `${eventData.params.savingsRate}%`,
+      [t('hoverStats.financialPhase.investmentReturn')]: `${eventData.params.investmentReturn}%`
     }
   }
 }

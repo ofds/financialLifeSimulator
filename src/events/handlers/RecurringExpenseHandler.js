@@ -24,14 +24,14 @@ export class RecurringExpenseHandler extends BaseEventHandler {
     return netWorth - expense;
   }
 
-  getHoverStats(eventData, age) {
+  getHoverStats(eventData, age, t) {
     const { amount, frequency, startDate, endDate } = eventData.params;
-    const status = age >= startDate && (!endDate || age <= endDate) ? 'Active' : 'Inactive';
+    const status = age >= startDate && (!endDate || age <= endDate) ? t('status.active') : t('status.inactive');
 
     return {
-      Amount: `${amount} (${frequency})`,
-      Status: status,
-      Period: `${startDate} - ${endDate || 'End'}`,
+      [t('hoverStats.recurringExpense.amount')]: `${amount} (${t(frequency)})`,
+      [t('hoverStats.recurringExpense.status')]: status,
+      [t('hoverStats.recurringExpense.period')]: `${startDate} - ${endDate || t('period.end')}`,
     };
   }
 }

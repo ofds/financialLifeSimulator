@@ -28,18 +28,18 @@ export class StudentLoanHandler extends BaseEventHandler {
     return netWorth - monthlyPayment * 12;
   }
 
-  getHoverStats(eventData, age) {
+  getHoverStats(eventData, age, t) {
     const { loanAmount, interestRate, repaymentTerm, monthlyPayment } = eventData.params;
     const yearsSinceStart = Math.max(0, age - eventData.age);
     const totalPaid = monthlyPayment * 12 * yearsSinceStart;
     const remainingBalance = loanAmount * Math.pow(1 + interestRate / 100, yearsSinceStart) - totalPaid;
 
     return {
-      'Loan Amount': loanAmount,
-      'Interest Rate': `${interestRate}%`,
-      'Monthly Payment': monthlyPayment,
-      'Remaining Balance': remainingBalance > 0 ? remainingBalance : 0,
-      'Years Left': repaymentTerm - yearsSinceStart > 0 ? repaymentTerm - yearsSinceStart : 0,
+      [t('hoverStats.studentLoan.loanAmount')]: loanAmount,
+      [t('hoverStats.studentLoan.interestRate')]: `${interestRate}%`,
+      [t('hoverStats.studentLoan.monthlyPayment')]: monthlyPayment,
+      [t('hoverStats.studentLoan.remainingBalance')]: remainingBalance > 0 ? remainingBalance : 0,
+      [t('hoverStats.studentLoan.yearsLeft')]: repaymentTerm - yearsSinceStart > 0 ? repaymentTerm - yearsSinceStart : 0,
     };
   }
 }

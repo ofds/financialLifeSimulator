@@ -1,5 +1,3 @@
-import i18n from '../i18n';
-
 // Fully modular base class with calculation configuration
 export class BaseEventHandler {
   constructor(config) {
@@ -73,18 +71,7 @@ export class BaseEventHandler {
   }
 
   // Generate hover statistics
-  getHoverStats(eventData, age) {
+  getHoverStats(eventData, age, t) {
     return {}
-  }
-
-  getTranslatedConfig() {
-    const translatedConfig = { ...this.config };
-    translatedConfig.label = i18n.t(this.config.label);
-    translatedConfig.fields = this.config.fields.map(field => ({
-      ...field,
-      label: i18n.t(field.label),
-      options: field.options ? field.options.map(option => i18n.t(option)) : undefined
-    }));
-    return translatedConfig;
   }
 }

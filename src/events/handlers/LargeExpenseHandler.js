@@ -19,11 +19,11 @@ export class LargeExpenseHandler extends BaseEventHandler {
     return netWorth - amount;
   }
 
-  getHoverStats(eventData) {
+  getHoverStats(eventData, t) {
     return {
-      'Expense Amount': eventData.params.amount,
-      Type: 'One-time expense',
-      'Impact Timing': 'After growth calculation',
+      [t('hoverStats.largeExpense.expenseAmount')]: eventData.params.amount,
+      [t('hoverStats.largeExpense.type')]: t('hoverStats.largeExpense.typeValue'),
+      [t('hoverStats.largeExpense.impactTiming')]: t('hoverStats.largeExpense.impactTimingValue'),
     };
   }
 }

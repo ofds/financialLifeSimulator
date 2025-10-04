@@ -36,7 +36,7 @@ export class HouseHandler extends BaseEventHandler {
     return netWorth + appreciation - maintenance - propertyTax
   }
 
-  getHoverStats(eventData, age) {
+  getHoverStats(eventData, age, t) {
     const yearsSince = Math.max(0, age - eventData.age)
     const currentValue = eventData.params.purchasePrice * Math.pow(
       1 + (eventData.params.appreciationRate || 3) / 100,
@@ -44,10 +44,10 @@ export class HouseHandler extends BaseEventHandler {
     )
     
     return {
-      'Purchase Price': eventData.params.purchasePrice,
-      'Current Value': currentValue,
-      'Appreciation Rate': `${eventData.params.appreciationRate}%/year`,
-      'Years Owned': yearsSince
+      [t('hoverStats.house.purchasePrice')]: eventData.params.purchasePrice,
+      [t('hoverStats.house.currentValue')]: currentValue,
+      [t('hoverStats.house.appreciationRate')]: `${eventData.params.appreciationRate}%/year`,
+      [t('hoverStats.house.yearsOwned')]: yearsSince
     }
   }
 }

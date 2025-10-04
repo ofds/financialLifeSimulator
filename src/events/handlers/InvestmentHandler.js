@@ -27,10 +27,10 @@ export class InvestmentHandler extends BaseEventHandler {
     return amount * (returnRate / 100);
   }
 
-  getHoverStats(eventData) {
+  getHoverStats(eventData, t) {
     return {
-      Amount: eventData.params.amount,
-      'Return Rate': `${eventData.params.returnRate}%`,
+      [t('hoverStats.investment.amount')]: eventData.params.amount,
+      [t('hoverStats.investment.returnRate')]: `${eventData.params.returnRate}%`,
     };
   }
 }

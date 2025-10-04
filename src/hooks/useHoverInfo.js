@@ -1,9 +1,11 @@
 import { useCallback } from 'react'
 import { useHover } from '../contexts/HoverContext'
 import { eventRegistry } from '../events/EventRegistry'
+import { useTranslation } from 'react-i18next'
 
 export function useHoverInfo() {
   const { updateHover, clearHover } = useHover()
+  const { t } = useTranslation()
   
   // Generate hover info for event type buttons
   const getEventTypeHoverInfo = useCallback((eventType) => {
@@ -11,41 +13,41 @@ export function useHoverInfo() {
     if (!config) return null
     
     return {
-      title: config.label,
-      type: 'Event Type',
+      title: t(config.label),
+      type: t('hoverInfo.eventType.type'),
       icon: config.icon,
       stats: {
-        'Fields': config.fields.length,
-        'Color': config.color
+        [t('hoverInfo.eventType.fields')]: config.fields.length,
+        [t('hoverInfo.eventType.color')]: config.color
       },
-      description: `Click to configure ${config.label} events`,
-      hints: ['💡 Configure parameters then drag to timeline']
+      description: t('hoverInfo.eventType.description', { label: t(config.label) }),
+      hints: [t('hoverInfo.eventType.hint')]
     }
-  }, [])
+  }, [t])
   
   // Generate hover info for form fields
   const getFieldHoverInfo = useCallback((field, config) => {
     const typeDescriptions = {
-      currency: 'Enter monetary value in BRL',
-      percentage: 'Enter percentage (0-100)',
-      number: 'Enter numeric value'
+      currency: t('hoverInfo.field.typeDescription.currency'),
+      percentage: t('hoverInfo.field.typeDescription.percentage'),
+      number: t('hoverInfo.field.typeDescription.number')
     }
     
     return {
-      title: field.label,
-      type: 'Input Field',
+      title: t(field.label),
+      type: t('hoverInfo.field.type'),
       icon: '✏️',
       stats: {
-        'Type': field.type,
-        'Default': field.default,
-        'Event': config.label
+        [t('hoverInfo.field.stats.type')]: field.type,
+        [t('hoverInfo.field.stats.default')]: field.default,
+        [t('hoverInfo.field.stats.event')]: t(config.label)
       },
-      description: typeDescriptions[field.type] || 'Enter value',
+      description: typeDescriptions[field.type] || t('hoverInfo.field.typeDescription.default'),
       hints: field.linkedFields 
-        ? ['💡 This field is synchronized with ' + field.linkedFields.join(', ')]
+        ? [t('hoverInfo.field.hint.linkedFields', { linkedFields: field.linkedFields.join(', ')})]
         : []
     }
-  }, [])
+  }, [t])
   
   return {
     updateHover,
