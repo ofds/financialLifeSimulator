@@ -40,7 +40,8 @@ export function useGraphTooltip(chartData, events) {
       type: 'Graph Point',
       icon: '📍',
       stats,
-      events: eventsAtThisAge,
+      // Deep clone events to prevent accidental mutation by consumer components.
+      events: JSON.parse(JSON.stringify(eventsAtThisAge)),
       description,
       hints,
     });

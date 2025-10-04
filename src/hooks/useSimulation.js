@@ -5,11 +5,15 @@ export function useSimulation() {
   const [events, setEvents] = useState([])
   const [currency, setCurrency] = useState('BRL')
   
-  const [simulationParams] = useState({
+  const [simulationParams, setSimulationParams] = useState({
     startAge: 15,
     endAge: 80,
     investmentReturn: 7
-  })
+  });
+
+  const updateSimulationParams = (newParams) => {
+    setSimulationParams(prev => ({ ...prev, ...newParams }));
+  };
 
   // Automatically recalculate whenever events change (useMemo is better than useEffect)
   const results = useMemo(() => {
@@ -61,6 +65,7 @@ export function useSimulation() {
     resetSimulation,
     results,
     simulationParams,
+    updateSimulationParams,
     currency,
     setCurrency
   }

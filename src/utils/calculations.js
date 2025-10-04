@@ -1,10 +1,10 @@
-import { eventRegistry } from '../events/EventRegistry'
+import { eventRegistry } from '../events/EventRegistry';
 
 class CalculationContext {
   constructor(params) {
-    this.startAge = params.startAge || 15
-    this.endAge = params.endAge || 80
-    this.allEvents = []
+    this.startAge = params.startAge;
+    this.endAge = params.endAge;
+    this.allEvents = [];
     this.modifiers = {
       taxRate: 0,
       inflationRate: 0,

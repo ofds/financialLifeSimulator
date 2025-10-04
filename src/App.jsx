@@ -20,7 +20,8 @@ function App() {
     removeEvent,
     resetSimulation,
     results,
-    simulationParams
+    simulationParams,
+    updateSimulationParams
   } = useSimulation()
 
   const handleSaveEvent = (eventId, newParams) => {
@@ -34,6 +35,7 @@ function App() {
           darkMode={darkMode}
           setDarkMode={setDarkMode}
           simulationParams={simulationParams}
+          updateSimulationParams={updateSimulationParams}
           resetSimulation={resetSimulation}
         />
         
@@ -53,6 +55,7 @@ function App() {
               removeEvent={removeEvent}
               updateEvent={updateEvent}
               onEditEvent={setEditingEvent}
+              simulationParams={simulationParams}
             />
             <BottomBar 
               selectedInputType={selectedInputType}

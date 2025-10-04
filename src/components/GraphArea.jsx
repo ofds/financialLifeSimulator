@@ -7,38 +7,71 @@ import { useHover } from '../contexts/HoverContext';
 
 const MemoizedCustomLabel = React.memo(CustomLabel);
 
-export default function GraphArea({ events, results, addEvent, removeEvent, updateEvent, onEditEvent }) {
+const CustomizedDot = ({ cx, cy, payload, inflectionAges }) => {
+  if (inflectionAges.has(payload.age)) {
+    return (
+      <Dot
+        cx={cx}
+        cy={cy}
+        r={6}
+        fill="#3b82f6"
+        stroke="#fff"
+        strokeWidth={2}
+        style={{ filter: 'drop-shadow(0 0 5px rgba(59, 130, 246, 0.7))' }}
+      />
+    );
+  }
+  return null;
+};
+
+// This checksum provides a stable dependency for the animation effect.
+const getEventsChecksum = (events) => {
+  if (!events || events.length === 0) return '0';
+
+  const serializeParams = (params) => {
+    if (!params) return '';
+    // Sort keys to ensure stable stringify, preventing re-renders from object key order changes.
+    const sortedKeys = Object.keys(params).sort();
+    const sortedParams = {};
+    for (const key of sortedKeys) {
+      sortedParams[key] = params[key];
+    }
+    return JSON.stringify(sortedParams);
+  };
+
+  return events.map(e => `${e.id}|${e.age}|${serializeParams(e.params)}`).join(',');
+};
+
+export default function GraphArea({ events, results, addEvent, removeEvent, updateEvent, onEditEvent, simulationParams }) {
   const [dragOverAge, setDragOverAge] = useState(null);
   const [draggingEvent, setDraggingEvent] = useState(null);
   const [animationKey, setAnimationKey] = useState(0);
-  const [zoom, setZoom] = useState({ start: 15, end: 80 });
-  const previousEventsRef = useRef(events);
+  const [zoom, setZoom] = useState({ start: simulationParams.startAge, end: simulationParams.endAge });
+
+  useEffect(() => {
+    setZoom({ start: simulationParams.startAge, end: simulationParams.endAge });
+  }, [simulationParams]);
 
   const fullChartData = useMemo(() => {
-    return results.length > 0 ? results : generatePlaceholderData();
-  }, [results]);
+    return results.length > 0 ? results : generatePlaceholderData(simulationParams);
+  }, [results, simulationParams]);
 
   const zoomedChartData = useMemo(() => {
     return fullChartData.filter(d => d.age >= zoom.start && d.age <= zoom.end);
   }, [fullChartData, zoom]);
 
-  const { handleMouseMove, clearHover: clearGraphHover } = useGraphTooltip(zoomedChartData, events);
+  const eventsChecksum = useMemo(() => getEventsChecksum(events), [events]);
 
   useEffect(() => {
-    if (previousEventsRef.current !== events) {
-      setAnimationKey(prev => prev + 1);
-      previousEventsRef.current = events;
-    }
-  }, [events]);
+    setAnimationKey(p => p + 1);
+  }, [eventsChecksum]);
 
   const getAgeFromPosition = useCallback((e) => {
     const rect = e.currentTarget.querySelector('.recharts-wrapper')?.getBoundingClientRect();
     if (!rect) return null;
-  
     const x = e.clientX - rect.left;
-    const effectiveX = x - 60; // paddingLeft
-    const effectiveWidth = rect.width - 60 - 30; // paddingLeft - paddingRight
-  
+    const effectiveX = x - 60;
+    const effectiveWidth = rect.width - 60 - 30;
     if (effectiveX >= 0 && effectiveX <= effectiveWidth) {
       const ageRange = zoom.end - zoom.start;
       const age = Math.round(zoom.start + (effectiveX / effectiveWidth) * ageRange);
@@ -51,25 +84,15 @@ export default function GraphArea({ events, results, addEvent, removeEvent, upda
     e.preventDefault();
     e.dataTransfer.dropEffect = 'copy';
     const age = getAgeFromPosition(e);
-    if (age) {
-      setDragOverAge(age);
-    }
+    if (age) setDragOverAge(age);
   }, [getAgeFromPosition]);
 
-  const handleDragLeave = useCallback(() => {
-    setDragOverAge(null);
-  }, []);
+  const handleDragLeave = useCallback(() => setDragOverAge(null), []);
 
   const handleDrop = useCallback((e) => {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData('application/json'));
-    if (dragOverAge) {
-      addEvent({
-        type: data.type,
-        age: dragOverAge,
-        params: data.params
-      });
-    }
+    if (dragOverAge) addEvent({ type: data.type, age: dragOverAge, params: data.params });
     setDragOverAge(null);
   }, [dragOverAge, addEvent]);
 
@@ -81,20 +104,15 @@ export default function GraphArea({ events, results, addEvent, removeEvent, upda
   const handleEventDrag = useCallback((e) => {
     if (!draggingEvent) return;
     const newAge = getAgeFromPosition(e);
-    if (newAge && newAge !== draggingEvent.age) {
-      updateEvent(draggingEvent.id, { age: newAge });
-    }
+    if (newAge && newAge !== draggingEvent.age) updateEvent(draggingEvent.id, { age: newAge });
   }, [draggingEvent, updateEvent, getAgeFromPosition]);
 
-  const handleEventDragEnd = useCallback(() => {
-    setDraggingEvent(null);
-  }, []);
+  const handleEventDragEnd = useCallback(() => setDraggingEvent(null), []);
 
   const eventMarkers = useMemo(() => {
     return events.filter(event => event.age >= zoom.start && event.age <= zoom.end).map(event => {
       const config = eventRegistry.getConfig(event.type);
       if (!config) return null;
-
       return (
         <ReferenceLine
           key={event.id}
@@ -119,16 +137,7 @@ export default function GraphArea({ events, results, addEvent, removeEvent, upda
     });
   }, [events, draggingEvent, handleEventDragStart, onEditEvent, removeEvent, zoom]);
 
-  const inflectionPoints = useMemo(() => {
-    const phaseEvents = events.filter(e => e.type === 'financial-phase' && e.age > zoom.start && e.age < zoom.end);
-    return phaseEvents.map(event => {
-      const dataPoint = fullChartData.find(d => d.age === event.age);
-      return {
-        ...event,
-        netWorth: dataPoint ? dataPoint.netWorth : 0
-      };
-    });
-  }, [events, fullChartData, zoom]);
+  const inflectionAges = useMemo(() => new Set(events.filter(e => e.type === 'financial-phase').map(e => e.age)), [events]);
 
   return (
     <div
@@ -140,67 +149,42 @@ export default function GraphArea({ events, results, addEvent, removeEvent, upda
       onMouseUp={handleEventDragEnd}
       style={{ cursor: draggingEvent ? 'grabbing' : 'default', opacity: draggingEvent ? 0.85 : 1 }}
     >
-      <ZoomControls zoom={zoom} setZoom={setZoom} />
+      <ZoomControls zoom={zoom} setZoom={setZoom} simulationParams={simulationParams} />
       <div className="flex-1 relative">
         {dragOverAge && !draggingEvent && <DragIndicator age={dragOverAge} zoom={zoom} />}
-
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={zoomedChartData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={clearGraphHover}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-            <XAxis
-              dataKey="age"
-              stroke="#94a3b8"
-              domain={[zoom.start, zoom.end]}
-              allowDataOverflow
-              type="number"
-              label={{ value: 'Age', position: 'insideBottom', offset: -10, fill: '#94a3b8' }}
-            />
-            <YAxis stroke="#94a3b8" tickFormatter={(value) => formatCurrency(value, 'BRL', true)}>
-              <Label value="Net Worth" angle={-90} position="insideLeft" style={{ fill: '#94a3b8', textAnchor: 'middle' }} />
-            </YAxis>
-            <Tooltip cursor={{ stroke: '#3b82f6', strokeWidth: 1 }} content={() => null} />
-            <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="3 3" />
-
-            <Line
-              key={animationKey}
-              type="cardinal"
-              tension={0.8}
-              dataKey="netWorth"
-              stroke="#3b82f6"
-              strokeWidth={3}
-              dot={false}
-              animationDuration={300}
-              animationEasing="ease-out"
-            />
-
-            {inflectionPoints.map(p => (
-              <Dot key={`dot-${p.id}`} cx={p.cx} cy={p.cy} r={6} fill="#3b82f6" stroke="#fff" strokeWidth={2} style={{ filter: 'drop-shadow(0 0 5px rgba(59, 130, 246, 0.7))' }} />
-            ))}
-
-            {eventMarkers}
-          </LineChart>
-        </ResponsiveContainer>
-
+        <ChartRenderer
+          zoomedChartData={zoomedChartData}
+          events={events}
+          animationKey={animationKey}
+          zoom={zoom}
+          eventMarkers={eventMarkers}
+          inflectionAges={inflectionAges}
+        />
         {events.length === 0 && <EmptyState />}
       </div>
-       <style>{`
-        .recharts-dot {
-          animation: pulse-dot 1.5s infinite;
-        }
-        @keyframes pulse-dot {
-          0% { transform: scale(1); opacity: 0.7; }
-          50% { transform: scale(1.3); opacity: 1; }
-          100% { transform: scale(1); opacity: 0.7; }
-        }
-      `}</style>
     </div>
   );
 }
+
+const ChartRenderer = React.memo(({ zoomedChartData, events, animationKey, zoom, eventMarkers, inflectionAges }) => {
+  const { handleMouseMove, clearHover: clearGraphHover } = useGraphTooltip(zoomedChartData, events);
+
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart data={zoomedChartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }} onMouseMove={handleMouseMove} onMouseLeave={clearGraphHover}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+        <XAxis dataKey="age" stroke="#94a3b8" domain={[zoom.start, zoom.end]} allowDataOverflow type="number" label={{ value: 'Age', position: 'insideBottom', offset: -10, fill: '#94a3b8' }} />
+        <YAxis stroke="#94a3b8" tickFormatter={(value) => formatCurrency(value, 'BRL', true)}>
+          <Label value="Net Worth" angle={-90} position="insideLeft" style={{ fill: '#94a3b8', textAnchor: 'middle' }} />
+        </YAxis>
+        <Tooltip cursor={{ stroke: '#3b82f6', strokeWidth: 1 }} content={() => null} />
+        <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="3 3" />
+        <Line type="cardinal" tension={0.8} dataKey="netWorth" stroke="#3b82f6" strokeWidth={3} dot={<CustomizedDot inflectionAges={inflectionAges} />} animationDuration={300} animationEasing="ease-out" />
+        {eventMarkers}
+      </LineChart>
+    </ResponsiveContainer>
+  );
+});
 
 function CustomLabel({ viewBox, value, fill, eventId, eventData, isDragging, onDragStart, onEdit, onRemove }) {
   const { x, y } = viewBox;
@@ -209,53 +193,14 @@ function CustomLabel({ viewBox, value, fill, eventId, eventData, isDragging, onD
 
   const handleMouseEnter = () => {
     const handler = eventRegistry.getHandler(eventData.type);
-    updateHover({
-      title: config.label,
-      type: `Event at Age ${eventData.age}`,
-      icon: config.icon,
-      stats: handler ? handler.getHoverStats(eventData, eventData.age) : {},
-      description: `Placed at age ${eventData.age}`,
-      hints: [
-        '💡 Click to edit this event',
-        '💡 Click and drag to move this event',
-        '💡 Middle-click to delete this event'
-      ]
-    });
+    updateHover({ title: config.label, type: `Event at Age ${eventData.age}`, icon: config.icon, stats: handler ? handler.getHoverStats(eventData, eventData.age) : {}, description: `Placed at age ${eventData.age}`, hints: ['💡 Click to edit', '💡 Drag to move', '💡 Middle-click to delete'] });
   };
 
   return (
     <g transform={`translate(${x}, ${y})`}>
-        <circle r="16" fill={fill} fillOpacity="0.2" />
-        <circle r="12" fill={fill} fillOpacity="0.3" />
-      <text
-        x={0}
-        y={-10}
-        fill={fill}
-        fontSize={isDragging ? 24 : 20}
-        textAnchor="middle"
-        dominantBaseline="central"
-        aria-label={`Event: ${config.label} at age ${eventData.age}`}
-        style={{
-          cursor: 'grab',
-          transition: 'font-size 0.2s, filter 0.2s',
-          filter: isDragging ? 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.9))' : 'none'
-        }}
-        onClick={(e) => {
-          if (!isDragging) {
-            e.stopPropagation();
-            onEdit(eventData);
-          }
-        }}
-        onMouseDown={(e) => {
-          if (e.button === 0) onDragStart(eventData, e);
-          else if (e.button === 1) {
-            e.preventDefault();
-            onRemove(eventId);
-          }
-        }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={clearHover}
-      >
+      <circle r="16" fill={fill} fillOpacity="0.2" />
+      <circle r="12" fill={fill} fillOpacity="0.3" />
+      <text x={0} y={-10} fill={fill} fontSize={isDragging ? 24 : 20} textAnchor="middle" dominantBaseline="central" aria-label={`Event: ${config.label} at age ${eventData.age}`} style={{ cursor: 'grab', transition: 'font-size 0.2s, filter 0.2s', filter: isDragging ? 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.9))' : 'none' }} onClick={(e) => { if (!isDragging) { e.stopPropagation(); onEdit(eventData); } }} onMouseDown={(e) => { if (e.button === 0) onDragStart(eventData, e); else if (e.button === 1) { e.preventDefault(); onRemove(eventId); } }} onMouseEnter={handleMouseEnter} onMouseLeave={clearHover}>
         {value}
       </text>
     </g>
@@ -263,18 +208,11 @@ function CustomLabel({ viewBox, value, fill, eventId, eventData, isDragging, onD
 }
 
 const DragIndicator = ({ age, zoom }) => {
-  const leftPercent = ((age - zoom.start) / (zoom.end - zoom.start)) * 100;
+  const ageRange = zoom.end - zoom.start;
+  const leftPercent = ageRange > 0 ? ((age - zoom.start) / ageRange) * 100 : 0;
   return (
-    <div
-      className="absolute top-20 bottom-20 w-0.5 bg-blue-500 z-10 pointer-events-none"
-      style={{
-        left: `calc(${leftPercent}% * 0.85 + 60px)`,
-        boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)'
-      }}
-    >
-      <div className="absolute top-1/2 -translate-y-1/2 left-1 bg-blue-500 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-        Age {age}
-      </div>
+    <div className="absolute top-20 bottom-20 w-0.5 bg-blue-500 z-10 pointer-events-none" style={{ left: `calc(${leftPercent}% * 0.85 + 60px)`, boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)' }}>
+      <div className="absolute top-1/2 -translate-y-1/2 left-1 bg-blue-500 text-white text-xs px-2 py-1 rounded whitespace-nowrap">Age {age}</div>
     </div>
   );
 };
@@ -289,24 +227,18 @@ const EmptyState = () => (
   </div>
 );
 
-const ZoomControls = ({ zoom, setZoom }) => {
+const ZoomControls = ({ zoom, setZoom, simulationParams }) => {
   const handleZoomIn = () => {
-    const newStart = Math.max(15, zoom.start + 5);
-    const newEnd = Math.min(80, zoom.end - 5);
-    if (newStart < newEnd) {
-      setZoom({ start: newStart, end: newEnd });
-    }
+    const newStart = Math.max(simulationParams.startAge, zoom.start + 5);
+    const newEnd = Math.min(simulationParams.endAge, zoom.end - 5);
+    if (newStart < newEnd) setZoom({ start: newStart, end: newEnd });
   };
-
   const handleZoomOut = () => {
-    const newStart = Math.max(15, zoom.start - 5);
-    const newEnd = Math.min(80, zoom.end + 5);
+    const newStart = Math.max(simulationParams.startAge, zoom.start - 5);
+    const newEnd = Math.min(simulationParams.endAge, zoom.end + 5);
     setZoom({ start: newStart, end: newEnd });
   };
-
-  const handleReset = () => {
-    setZoom({ start: 15, end: 80 });
-  };
+  const handleReset = () => setZoom({ start: simulationParams.startAge, end: simulationParams.endAge });
 
   return (
     <div className="absolute top-4 right-10 z-20 flex items-center space-x-2">
@@ -317,6 +249,10 @@ const ZoomControls = ({ zoom, setZoom }) => {
   );
 };
 
-function generatePlaceholderData() {
-  return Array.from({ length: 66 }, (_, i) => ({ age: i + 15, netWorth: 0 }));
+function generatePlaceholderData(simulationParams) {
+  const data = [];
+  for (let age = simulationParams.startAge; age <= simulationParams.endAge; age++) {
+    data.push({ age, netWorth: 0 });
+  }
+  return data;
 }
