@@ -38,13 +38,13 @@ export class RecurringExpenseHandler extends BaseEventHandler {
 
 export const recurringExpenseConfig = {
   type: 'recurring-expense',
-  label: 'Recurring Expense',
+  label: 'event.recurring-expense.label',
   icon: '🧾',
   color: '#f97316',
   fields: [
-    { name: 'amount', label: 'Amount', type: 'currency', default: 100 },
-    { name: 'frequency', label: 'Frequency', type: 'select', options: ['monthly', 'annually'], default: 'monthly' },
-    { name: 'startDate', label: 'Start Age', type: 'number', default: 30 },
-    { name: 'endDate', label: 'End Age (optional)', type: 'number', default: null },
+    { name: 'amount', label: 'event.recurring-expense.field.amount.label', type: 'currency', default: 100 },
+    { name: 'frequency', label: 'event.recurring-expense.field.frequency.label', type: 'select', options: ['monthly', 'annually'], default: 'monthly' },
+    { name: 'startDate', label: 'event.recurring-expense.field.startDate.label', type: 'number', default: 30 },
+    { name: 'endDate', label: 'event.recurring-expense.field.endDate.label', type: 'number', default: null },
   ],
 };

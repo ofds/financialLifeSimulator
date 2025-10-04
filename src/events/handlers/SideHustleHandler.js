@@ -43,14 +43,14 @@ export class SideHustleHandler extends BaseEventHandler {
 
 export const sideHustleConfig = {
   type: 'side-hustle',
-  label: 'Side Hustle',
+  label: 'event.side-hustle.label',
   icon: '🚀',
   color: '#d946ef',
   fields: [
-    { name: 'monthlyIncome', label: 'Monthly Income', type: 'currency', default: 500 },
-    { name: 'annualIncome', label: 'Annual Income', type: 'currency', default: 6000 },
-    { name: 'growthRate', label: 'Annual Growth Rate (%)', type: 'percentage', default: 10 },
-    { name: 'startDate', label: 'Start Age', type: 'number', default: 30 },
-    { name: 'endDate', label: 'End Age (optional)', type: 'number', default: null },
+    { name: 'monthlyIncome', label: 'event.side-hustle.field.monthlyIncome.label', type: 'currency', default: 500 },
+    { name: 'annualIncome', label: 'event.side-hustle.field.annualIncome.label', type: 'currency', default: 6000 },
+    { name: 'growthRate', label: 'event.side-hustle.field.growthRate.label', type: 'percentage', default: 10 },
+    { name: 'startDate', label: 'event.side-hustle.field.startDate.label', type: 'number', default: 30 },
+    { name: 'endDate', label: 'event.side-hustle.field.endDate.label', type: 'number', default: null },
   ],
 };

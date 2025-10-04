@@ -111,6 +111,15 @@ The system is designed to be robust, with logic in place to handle multiple sequ
 
 ***
 
+## 🌐 Internationalization (i18n)
+
+The application supports multiple languages using the `i18next` library. Translations are stored in JSON files located in the `public/locales` directory.
+
+- **Adding a new language:** Create a new folder for the language code (e.g., `fr`) and add a `translation.json` file.
+- **Translating events:** Event labels and fields are translated using keys in the format `event.<eventType>.label` and `event.<eventType>.field.<fieldName>.label`.
+
+***
+
 ## 🧮 Calculation Engine (`src/utils/calculations.js`)
 
 The engine is **completely generic** and knows nothing about specific event types. The simulation range is controlled by parameters passed from the UI.

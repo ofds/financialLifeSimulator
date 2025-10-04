@@ -54,16 +54,16 @@ export class HouseHandler extends BaseEventHandler {
 
 export const houseConfig = {
   type: 'house',
-  label: 'House Purchase',
+  label: 'event.house.label',
   icon: '🏠',
   color: '#f59e0b',
   fields: [
-    { name: 'purchasePrice', label: 'Purchase Price', type: 'currency', default: 300000 },
-    { name: 'downPayment', label: 'Down Payment (%)', type: 'percentage', default: 20 },
-    { name: 'mortgageRate', label: 'Mortgage Interest Rate (%)', type: 'percentage', default: 4.5 },
-    { name: 'mortgageTerm', label: 'Mortgage Term (years)', type: 'number', default: 30 },
-    { name: 'appreciationRate', label: 'Appreciation Rate (%/year)', type: 'percentage', default: 3 },
-    { name: 'maintenanceCost', label: 'Annual Maintenance Cost', type: 'currency', default: 3000 },
-    { name: 'propertyTax', label: 'Annual Property Tax', type: 'currency', default: 2000 }
+    { name: 'purchasePrice', label: 'event.house.field.purchasePrice.label', type: 'currency', default: 300000 },
+    { name: 'downPayment', label: 'event.house.field.downPayment.label', type: 'percentage', default: 20 },
+    { name: 'mortgageRate', label: 'event.house.field.mortgageRate.label', type: 'percentage', default: 4.5 },
+    { name: 'mortgageTerm', label: 'event.house.field.mortgageTerm.label', type: 'number', default: 30 },
+    { name: 'appreciationRate', label: 'event.house.field.appreciationRate.label', type: 'percentage', default: 3 },
+    { name: 'maintenanceCost', label: 'event.house.field.maintenanceCost.label', type: 'currency', default: 3000 },
+    { name: 'propertyTax', label: 'event.house.field.propertyTax.label', type: 'currency', default: 2000 }
   ]
 }

@@ -35,15 +35,15 @@ export class RetirementHandler extends FinancialPhaseHandler {
 
 export const retirementConfig = {
   type: 'retirement',
-  label: 'Retirement',
+  label: 'event.retirement.label',
   icon: '🏖️',
   color: '#0891b2',
   fields: [
-    { name: 'annualWithdrawal', label: 'Annual Withdrawal', type: 'currency', default: 40000 },
-    { name: 'monthlyWithdrawal', label: 'Monthly Withdrawal', type: 'currency', default: 3333 },
-    { name: 'withdrawalRate', label: 'Withdrawal Rate (% of portfolio)', type: 'percentage', default: 4 },
-    { name: 'pensionIncome', label: 'Annual Pension Income', type: 'currency', default: 20000 },
-    { name: 'monthlyPensionIncome', label: 'Monthly Pension Income', type: 'currency', default: 1667 },
-    { name: 'investmentReturn', label: 'Investment Return Rate (%)', type: 'percentage', default: 5 },
+    { name: 'annualWithdrawal', label: 'event.retirement.field.annualWithdrawal.label', type: 'currency', default: 40000 },
+    { name: 'monthlyWithdrawal', label: 'event.retirement.field.monthlyWithdrawal.label', type: 'currency', default: 3333 },
+    { name: 'withdrawalRate', label: 'event.retirement.field.withdrawalRate.label', type: 'percentage', default: 4 },
+    { name: 'pensionIncome', label: 'event.retirement.field.pensionIncome.label', type: 'currency', default: 20000 },
+    { name: 'monthlyPensionIncome', label: 'event.retirement.field.monthlyPensionIncome.label', type: 'currency', default: 1667 },
+    { name: 'investmentReturn', label: 'event.retirement.field.investmentReturn.label', type: 'percentage', default: 5 },
   ],
 };

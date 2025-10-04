@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { eventRegistry } from '../events/EventRegistry'
 import { useHoverInfo } from '../hooks/useHoverInfo'
 
 export default function BottomBar({ selectedInputType, setSelectedInputType }) {
+  const { t } = useTranslation();
   const eventTypes = Array.from(eventRegistry.handlers.keys())
   const { getEventTypeHoverInfo, updateHover, clearHover } = useHoverInfo()
   
@@ -31,7 +33,7 @@ export default function BottomBar({ selectedInputType, setSelectedInputType }) {
               `}
             >
               <span className="text-lg">{config.icon}</span>
-              <span>{config.label}</span>
+              <span>{t(config.label)}</span>
             </button>
           )
         })}

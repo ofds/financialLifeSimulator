@@ -1,9 +1,11 @@
 import { useState, useCallback, memo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { eventRegistry } from '../events/EventRegistry'
 import { useEventForm } from '../hooks/useEventForm'
 import { useHoverInfo } from '../hooks/useHoverInfo'
 
 const InputField = memo(({ field, value, onChange, config }) => {
+  const { t } = useTranslation();
   const { getFieldHoverInfo, updateHover, clearHover } = useHoverInfo()
   
   const fieldHoverInfo = getFieldHoverInfo(field, config)
@@ -74,7 +76,7 @@ const InputField = memo(({ field, value, onChange, config }) => {
           >
             {field.options.map(option => (
               <option key={option} value={option}>
-                {option.charAt(0).toUpperCase() + option.slice(1).replace('-', ' ')}
+                {t(option)}
               </option>
             ))}
           </select>
@@ -89,6 +91,7 @@ const InputField = memo(({ field, value, onChange, config }) => {
 InputField.displayName = 'InputField'
 
 export default function InputSidebar({ selectedInputType, addEvent }) {
+  const { t } = useTranslation();
   const config = eventRegistry.getConfig(selectedInputType)
   const { formData, handleFieldChange } = useEventForm(config)
   const [isDragging, setIsDragging] = useState(false)
@@ -110,7 +113,7 @@ export default function InputSidebar({ selectedInputType, addEvent }) {
   if (!config) {
     return (
       <div className="h-full bg-slate-850 border-r border-slate-700 flex items-center justify-center">
-        <p className="text-slate-400">Event type not found</p>
+        <p className="text-slate-400">{t('eventTypeNotFound')}</p>
       </div>
     )
   }
@@ -121,8 +124,8 @@ export default function InputSidebar({ selectedInputType, addEvent }) {
         <div className="flex items-center gap-3">
           <span className="text-2xl">{config.icon}</span>
           <div>
-            <h2 className="text-lg font-semibold text-slate-100">{config.label}</h2>
-            <p className="text-sm text-slate-400">Configure and drag to timeline</p>
+            <h2 className="text-lg font-semibold text-slate-100">{t(config.label)}</h2>
+            <p className="text-sm text-slate-400">{t('configureAndDrag')}</p>
           </div>
         </div>
       </div>
@@ -131,7 +134,7 @@ export default function InputSidebar({ selectedInputType, addEvent }) {
         {config.fields.map(field => (
           <div key={field.name}>
             <label className="block text-sm font-medium text-slate-300 mb-2">
-              {field.label}
+              {t(field.label)}
             </label>
             <InputField 
               field={field}
@@ -159,11 +162,11 @@ export default function InputSidebar({ selectedInputType, addEvent }) {
         >
           <span className="text-2xl">{config.icon}</span>
           <span className="text-white font-medium">
-            Drag to Timeline
+            {t('dragToTimeline')}
           </span>
         </div>
         <p className="text-xs text-slate-500 text-center mt-2">
-          Drag this marker onto the graph to add the event
+          {t('dragToTimelineDescription')}
         </p>
       </div>
     </div>

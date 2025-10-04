@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Hoverable from './Hoverable';
 
 export default function TopBar({ darkMode, setDarkMode, simulationParams, updateSimulationParams, resetSimulation }) {
+  const { t, i18n } = useTranslation();
   const { startAge, endAge } = simulationParams;
 
   const handleAgeChange = (param, value) => {
@@ -12,16 +14,21 @@ export default function TopBar({ darkMode, setDarkMode, simulationParams, update
   };
 
   const handleNewScenario = () => {
-    if (confirm('Create a new scenario? This will clear your current work.')) {
+    if (confirm(t('newScenarioConfirmation'))) {
       resetSimulation();
     }
+  };
+
+  const changeLanguage = () => {
+    const newLang = i18n.language === 'en-US' ? 'pt-BR' : 'en-US';
+    i18n.changeLanguage(newLang);
   };
 
   return (
     <div className="bg-slate-900 border-b border-slate-700 px-6 py-4 flex items-center justify-between">
       <Hoverable
         hoverInfo={{
-          title: 'Financial Life Simulator',
+          title: t('appTitle'),
           type: 'Application',
           icon: '📊',
           stats: { 'Version': 'MVP v0.3' },
@@ -30,12 +37,12 @@ export default function TopBar({ darkMode, setDarkMode, simulationParams, update
       >
         <div className="flex items-center gap-3 cursor-pointer">
           <div className="text-2xl">📊</div>
-          <h1 className="text-xl font-bold text-slate-100">Financial Life Simulator</h1>
+          <h1 className="text-xl font-bold text-slate-100">{t('appTitle')}</h1>
         </div>
       </Hoverable>
       
       <div className="flex items-center gap-4 text-sm text-slate-300">
-        <label htmlFor="startAge" className="text-sm">Age</label>
+        <label htmlFor="startAge" className="text-sm">{t('age')}</label>
         <input 
           id="startAge"
           type="number" 
@@ -57,7 +64,14 @@ export default function TopBar({ darkMode, setDarkMode, simulationParams, update
           onClick={handleNewScenario}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
         >
-          New Scenario
+          {t('newScenario')}
+        </button>
+
+        <button 
+          onClick={changeLanguage}
+          className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-colors"
+        >
+          {i18n.language === 'en-US' ? '🇧🇷' : '🇺🇸'}
         </button>
         
         <button 

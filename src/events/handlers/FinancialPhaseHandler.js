@@ -64,14 +64,14 @@ export class FinancialPhaseHandler extends BaseEventHandler {
 
 export const financialPhaseConfig = {
   type: 'financial-phase',
-  label: 'Financial Phase',
+  label: 'event.financial-phase.label',
   icon: '📊',
   color: '#3b82f6',
   fields: [
-    { name: 'startingNetWorth', label: 'Starting Net Worth', type: 'currency', default: 0 },
-    { name: 'annualIncome', label: 'Annual Income', type: 'currency', default: 50000 },
-    { name: 'monthlyIncome', label: 'Monthly Income', type: 'currency', default: 4167 },
-    { name: 'investmentReturn', label: 'Investment Return Rate (%)', type: 'percentage', default: 7 },
-    { name: 'savingsRate', label: 'Savings Rate (%)', type: 'percentage', default: 20 }
+    { name: 'startingNetWorth', label: 'event.financial-phase.field.startingNetWorth.label', type: 'currency', default: 0 },
+    { name: 'annualIncome', label: 'event.financial-phase.field.annualIncome.label', type: 'currency', default: 50000 },
+    { name: 'monthlyIncome', label: 'event.financial-phase.field.monthlyIncome.label', type: 'currency', default: 4167 },
+    { name: 'investmentReturn', label: 'event.financial-phase.field.investmentReturn.label', type: 'percentage', default: 7 },
+    { name: 'savingsRate', label: 'event.financial-phase.field.savingsRate.label', type: 'percentage', default: 20 }
   ]
 }

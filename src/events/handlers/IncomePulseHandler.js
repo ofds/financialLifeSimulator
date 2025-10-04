@@ -36,10 +36,10 @@ export class IncomePulseHandler extends BaseEventHandler {
 
 export const incomePulseConfig = {
   type: 'outstanding-income',
-  label: 'Income Pulse',
+  label: 'event.outstanding-income.label',
   icon: '💰',
   color: '#8b5cf6',
   fields: [
-    { name: 'amount', label: 'Total Amount', type: 'currency', default: 50000 }
+    { name: 'amount', label: 'event.outstanding-income.field.amount.label', type: 'currency', default: 50000 }
   ]
 }

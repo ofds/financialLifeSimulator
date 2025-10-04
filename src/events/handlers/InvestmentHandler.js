@@ -37,11 +37,11 @@ export class InvestmentHandler extends BaseEventHandler {
 
 export const investmentConfig = {
   type: 'investment',
-  label: 'Investment',
+  label: 'event.investment.label',
   icon: '📈',
   color: '#14b8a6',
   fields: [
-    { name: 'amount', label: 'Amount', type: 'currency', default: 25000 },
-    { name: 'returnRate', label: 'Annual Return Rate (%)', type: 'percentage', default: 10 },
+    { name: 'amount', label: 'event.investment.field.amount.label', type: 'currency', default: 25000 },
+    { name: 'returnRate', label: 'event.investment.field.returnRate.label', type: 'percentage', default: 10 },
   ],
 };

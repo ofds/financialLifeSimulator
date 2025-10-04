@@ -46,13 +46,13 @@ export class StudentLoanHandler extends BaseEventHandler {
 
 export const studentLoanConfig = {
   type: 'student-loan',
-  label: 'Student Loan',
+  label: 'event.student-loan.label',
   icon: '🎓',
   color: '#10b981',
   fields: [
-    { name: 'loanAmount', label: 'Loan Amount', type: 'currency', default: 40000 },
-    { name: 'interestRate', label: 'Interest Rate (%)', type: 'percentage', default: 5 },
-    { name: 'repaymentTerm', label: 'Repayment Term (years)', type: 'number', default: 10 },
-    { name: 'monthlyPayment', label: 'Monthly Payment', type: 'currency', default: 424 },
+    { name: 'loanAmount', label: 'event.student-loan.field.loanAmount.label', type: 'currency', default: 40000 },
+    { name: 'interestRate', label: 'event.student-loan.field.interestRate.label', type: 'percentage', default: 5 },
+    { name: 'repaymentTerm', label: 'event.student-loan.field.repaymentTerm.label', type: 'number', default: 10 },
+    { name: 'monthlyPayment', label: 'event.student-loan.field.monthlyPayment.label', type: 'currency', default: 424 },
   ],
 };

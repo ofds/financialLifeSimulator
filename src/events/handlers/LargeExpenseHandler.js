@@ -30,8 +30,8 @@ export class LargeExpenseHandler extends BaseEventHandler {
 
 export const largeExpenseConfig = {
   type: 'large-expense',
-  label: 'Large Expense',
+  label: 'event.large-expense.label',
   icon: '💸',
   color: '#ef4444',
-  fields: [{ name: 'amount', label: 'Total Amount', type: 'currency', default: 10000 }],
+  fields: [{ name: 'amount', label: 'event.large-expense.field.amount.label', type: 'currency', default: 10000 }],
 };

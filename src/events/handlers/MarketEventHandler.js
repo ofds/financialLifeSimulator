@@ -35,12 +35,12 @@ export class MarketEventHandler extends BaseEventHandler {
 
 export const marketEventConfig = {
   type: 'market-event',
-  label: 'Market Event',
+  label: 'event.market-event.label',
   icon: '📉',
   color: '#4f46e5',
   fields: [
-    { name: 'startAge', label: 'Start Age', type: 'number', default: 40 },
-    { name: 'duration', label: 'Duration (years)', type: 'number', default: 2 },
-    { name: 'returnAdjustment', label: 'Return Adjustment (%)', type: 'percentage', default: -20 },
+    { name: 'startAge', label: 'event.market-event.field.startAge.label', type: 'number', default: 40 },
+    { name: 'duration', label: 'event.market-event.field.duration.label', type: 'number', default: 2 },
+    { name: 'returnAdjustment', label: 'event.market-event.field.returnAdjustment.label', type: 'percentage', default: -20 },
   ],
 };
