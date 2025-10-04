@@ -1,5 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Label, Dot } from 'recharts';
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { formatCurrency } from '../utils/formatters';
 import { eventRegistry } from '../events/EventRegistry';
 import { useGraphTooltip } from '../hooks/useGraphTooltip';
@@ -9,43 +9,14 @@ const MemoizedCustomLabel = React.memo(CustomLabel);
 
 const CustomizedDot = ({ cx, cy, payload, inflectionAges }) => {
   if (inflectionAges.has(payload.age)) {
-    return (
-      <Dot
-        cx={cx}
-        cy={cy}
-        r={6}
-        fill="#3b82f6"
-        stroke="#fff"
-        strokeWidth={2}
-        style={{ filter: 'drop-shadow(0 0 5px rgba(59, 130, 246, 0.7))' }}
-      />
-    );
+    return <Dot cx={cx} cy={cy} r={6} fill="#3b82f6" stroke="#fff" strokeWidth={2} style={{ filter: 'drop-shadow(0 0 5px rgba(59, 130, 246, 0.7))' }} />;
   }
   return null;
-};
-
-// This checksum provides a stable dependency for the animation effect.
-const getEventsChecksum = (events) => {
-  if (!events || events.length === 0) return '0';
-
-  const serializeParams = (params) => {
-    if (!params) return '';
-    // Sort keys to ensure stable stringify, preventing re-renders from object key order changes.
-    const sortedKeys = Object.keys(params).sort();
-    const sortedParams = {};
-    for (const key of sortedKeys) {
-      sortedParams[key] = params[key];
-    }
-    return JSON.stringify(sortedParams);
-  };
-
-  return events.map(e => `${e.id}|${e.age}|${serializeParams(e.params)}`).join(',');
 };
 
 export default function GraphArea({ events, results, addEvent, removeEvent, updateEvent, onEditEvent, simulationParams }) {
   const [dragOverAge, setDragOverAge] = useState(null);
   const [draggingEvent, setDraggingEvent] = useState(null);
-  const [animationKey, setAnimationKey] = useState(0);
   const [zoom, setZoom] = useState({ start: simulationParams.startAge, end: simulationParams.endAge });
 
   useEffect(() => {
@@ -59,12 +30,6 @@ export default function GraphArea({ events, results, addEvent, removeEvent, upda
   const zoomedChartData = useMemo(() => {
     return fullChartData.filter(d => d.age >= zoom.start && d.age <= zoom.end);
   }, [fullChartData, zoom]);
-
-  const eventsChecksum = useMemo(() => getEventsChecksum(events), [events]);
-
-  useEffect(() => {
-    setAnimationKey(p => p + 1);
-  }, [eventsChecksum]);
 
   const getAgeFromPosition = useCallback((e) => {
     const rect = e.currentTarget.querySelector('.recharts-wrapper')?.getBoundingClientRect();
@@ -109,6 +74,55 @@ export default function GraphArea({ events, results, addEvent, removeEvent, upda
 
   const handleEventDragEnd = useCallback(() => setDraggingEvent(null), []);
 
+  return (
+    <div
+      className="flex-1 bg-slate-900 p-6 relative transition-opacity duration-300 flex flex-col"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      onMouseMove={draggingEvent ? handleEventDrag : undefined}
+      onMouseUp={handleEventDragEnd}
+      style={{ cursor: draggingEvent ? 'grabbing' : 'default', opacity: draggingEvent ? 0.85 : 1 }}
+    >
+      <ZoomControls zoom={zoom} setZoom={setZoom} simulationParams={simulationParams} />
+      <div className="flex-1 relative">
+        {dragOverAge && !draggingEvent && <DragIndicator age={dragOverAge} zoom={zoom} />}
+        <ChartRenderer
+          zoomedChartData={zoomedChartData}
+          events={events}
+          zoom={zoom}
+          draggingEvent={draggingEvent}
+          handleEventDragStart={handleEventDragStart}
+          onEditEvent={onEditEvent}
+          removeEvent={removeEvent}
+        />
+        {events.length === 0 && <EmptyState />}
+      </div>
+    </div>
+  );
+}
+
+const ChartRenderer = React.memo(({ zoomedChartData, events, zoom, draggingEvent, handleEventDragStart, onEditEvent, removeEvent }) => {
+  const { handleMouseMove, clearHover: clearGraphHover } = useGraphTooltip(zoomedChartData, events);
+  const [animationKey, setAnimationKey] = useState(0);
+
+  // Checksum logic is now inside the memoized component
+  const eventsChecksum = useMemo(() => {
+    if (!events || events.length === 0) return '0';
+    const serializeParams = (params) => {
+      if (!params) return '';
+      const sortedKeys = Object.keys(params).sort();
+      const sortedParams = {};
+      for (const key of sortedKeys) sortedParams[key] = params[key];
+      return JSON.stringify(sortedParams);
+    };
+    return events.map(e => `${e.id}|${e.age}|${serializeParams(e.params)}`).join(',');
+  }, [events]);
+
+  useEffect(() => {
+    setAnimationKey(p => p + 1);
+  }, [eventsChecksum]);
+
   const eventMarkers = useMemo(() => {
     return events.filter(event => event.age >= zoom.start && event.age <= zoom.end).map(event => {
       const config = eventRegistry.getConfig(event.type);
@@ -135,39 +149,9 @@ export default function GraphArea({ events, results, addEvent, removeEvent, upda
         />
       );
     });
-  }, [events, draggingEvent, handleEventDragStart, onEditEvent, removeEvent, zoom]);
+  }, [events, zoom, draggingEvent, handleEventDragStart, onEditEvent, removeEvent]);
 
   const inflectionAges = useMemo(() => new Set(events.filter(e => e.type === 'financial-phase').map(e => e.age)), [events]);
-
-  return (
-    <div
-      className="flex-1 bg-slate-900 p-6 relative transition-opacity duration-300 flex flex-col"
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      onMouseMove={draggingEvent ? handleEventDrag : undefined}
-      onMouseUp={handleEventDragEnd}
-      style={{ cursor: draggingEvent ? 'grabbing' : 'default', opacity: draggingEvent ? 0.85 : 1 }}
-    >
-      <ZoomControls zoom={zoom} setZoom={setZoom} simulationParams={simulationParams} />
-      <div className="flex-1 relative">
-        {dragOverAge && !draggingEvent && <DragIndicator age={dragOverAge} zoom={zoom} />}
-        <ChartRenderer
-          zoomedChartData={zoomedChartData}
-          events={events}
-          animationKey={animationKey}
-          zoom={zoom}
-          eventMarkers={eventMarkers}
-          inflectionAges={inflectionAges}
-        />
-        {events.length === 0 && <EmptyState />}
-      </div>
-    </div>
-  );
-}
-
-const ChartRenderer = React.memo(({ zoomedChartData, events, animationKey, zoom, eventMarkers, inflectionAges }) => {
-  const { handleMouseMove, clearHover: clearGraphHover } = useGraphTooltip(zoomedChartData, events);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -179,7 +163,7 @@ const ChartRenderer = React.memo(({ zoomedChartData, events, animationKey, zoom,
         </YAxis>
         <Tooltip cursor={{ stroke: '#3b82f6', strokeWidth: 1 }} content={() => null} />
         <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="3 3" />
-        <Line type="cardinal" tension={0.8} dataKey="netWorth" stroke="#3b82f6" strokeWidth={3} dot={<CustomizedDot inflectionAges={inflectionAges} />} animationDuration={300} animationEasing="ease-out" />
+        <Line key={animationKey} type="cardinal" tension={0.8} dataKey="netWorth" stroke="#3b82f6" strokeWidth={3} dot={<CustomizedDot inflectionAges={inflectionAges} />} animationDuration={300} animationEasing="ease-out" />
         {eventMarkers}
       </LineChart>
     </ResponsiveContainer>
