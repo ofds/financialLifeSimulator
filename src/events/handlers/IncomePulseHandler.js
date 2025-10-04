@@ -20,9 +20,8 @@ export class IncomePulseHandler extends BaseEventHandler {
   }
 
   calculateImmediateImpact(netWorth, eventData, age, allEvents, context) {
-    const amount = eventData.params.amount || 0
-    console.log(`Income Pulse at age ${age}: Adding ${amount} to ${netWorth}`)
-    return netWorth + amount
+    const amount = eventData.params.amount || 0;
+    return netWorth + amount;
   }
 
   getHoverStats(eventData, age) {

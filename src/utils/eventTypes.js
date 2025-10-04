@@ -7,7 +7,14 @@ export const EVENT_TYPES = {
   HOUSE: 'house',
   OUTSTANDING_INCOME: 'outstanding-income',
   INVESTMENT: 'investment',
-  EXPENSE: 'expense'
+  EXPENSE: 'expense',
+  LARGE_EXPENSE: 'large-expense',
+  RECURRING_EXPENSE: 'recurring-expense',
+  CAR_PURCHASE: 'car-purchase',
+  STUDENT_LOAN: 'student-loan',
+  SIDE_HUSTLE: 'side-hustle',
+  MARKET_EVENT: 'market-event',
+  RETIREMENT: 'retirement'
 }
 
 // Dynamic getter for configs from registry

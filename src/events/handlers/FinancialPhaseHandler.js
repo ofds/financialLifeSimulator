@@ -38,7 +38,7 @@ export class FinancialPhaseHandler extends BaseEventHandler {
     
     if (!activePhase || activePhase.id !== eventData.id) return 0
     
-    const annualIncome = eventData.params.annualIncome || 0
+    const annualIncome = eventData.params.annualIncome || (eventData.params.monthlyIncome * 12) || 0;
     const savingsRate = (eventData.params.savingsRate || 0) / 100
     const investmentReturn = (eventData.params.investmentReturn || 0) / 100
     
