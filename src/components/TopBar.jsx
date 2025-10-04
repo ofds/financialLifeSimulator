@@ -2,7 +2,7 @@ import React from 'react';
 import Hoverable from './Hoverable';
 
 export default function TopBar({ darkMode, setDarkMode, simulationParams, updateSimulationParams, resetSimulation }) {
-  const { startAge, endAge, investmentReturn } = simulationParams;
+  const { startAge, endAge } = simulationParams;
 
   const handleAgeChange = (param, value) => {
     const numericValue = parseInt(value, 10);
@@ -24,7 +24,7 @@ export default function TopBar({ darkMode, setDarkMode, simulationParams, update
           title: 'Financial Life Simulator',
           type: 'Application',
           icon: '📊',
-          stats: { 'Version': 'MVP v0.2' },
+          stats: { 'Version': 'MVP v0.3' },
           description: 'Simulate your financial journey through life'
         }}
       >
@@ -53,20 +53,12 @@ export default function TopBar({ darkMode, setDarkMode, simulationParams, update
       </div>
       
       <div className="flex items-center gap-3">
-        <Hoverable
-          hoverInfo={{
-            title: 'New Scenario',
-            icon: '🆕',
-            description: 'Clear all events and start fresh'
-          }}
+        <button 
+          onClick={handleNewScenario}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
         >
-          <button 
-            onClick={handleNewScenario}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
-          >
-            New Scenario
-          </button>
-        </Hoverable>
+          New Scenario
+        </button>
         
         <button 
           onClick={() => setDarkMode(!darkMode)}

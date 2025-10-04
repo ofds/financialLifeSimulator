@@ -17,7 +17,7 @@ The **Financial Life Simulator** is a fully modular, client-side financial plann
 - **Interactive Timeline:** Drag-and-drop financial events directly onto a graph representing your life.
 - **Dynamic Calculations:** The graph and simulation results update instantly as you add, remove, or modify events.
 - **Configurable Simulation:** Easily change the simulation's start and end ages directly from the UI.
-- **Visual Analysis:** The graph uses a cardinal curve with inflection point markers to clearly visualize changes in your financial trajectory.
+- **Visual Analysis:** The graph uses a smooth, monotone curve with inflection point markers to clearly visualize changes in your financial trajectory.
 - **Zoom & Pan:** Zoom in on specific periods of your life to get a more detailed view.
 
 ---

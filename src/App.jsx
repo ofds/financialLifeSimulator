@@ -12,7 +12,7 @@ function App() {
   const [selectedInputType, setSelectedInputType] = useState('financial-phase')
   const [darkMode, setDarkMode] = useState(true)
   const [editingEvent, setEditingEvent] = useState(null)
-  
+
   const {
     events,
     addEvent,

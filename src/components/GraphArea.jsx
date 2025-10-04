@@ -14,6 +14,32 @@ const CustomizedDot = ({ cx, cy, payload, inflectionAges }) => {
   return null;
 };
 
+const EventMarkerDot = (props) => {
+  const { cx, payload, events, draggingEvent, handleEventDragStart, onEditEvent, removeEvent } = props;
+  const event = events.find(e => e.age === payload.age);
+
+  if (event) {
+    const config = eventRegistry.getConfig(event.type);
+    if (!config) return null;
+
+    return (
+      <MemoizedCustomLabel
+        x={cx}
+        y={25} // Position at a fixed Y value from the top
+        value={config.icon}
+        fill={config.color}
+        eventId={event.id}
+        eventData={event}
+        isDragging={draggingEvent?.id === event.id}
+        onDragStart={handleEventDragStart}
+        onEdit={onEditEvent}
+        onRemove={removeEvent}
+      />
+    );
+  }
+  return null;
+};
+
 export default function GraphArea({ events, results, addEvent, removeEvent, updateEvent, onEditEvent, simulationParams }) {
   const [dragOverAge, setDragOverAge] = useState(null);
   const [draggingEvent, setDraggingEvent] = useState(null);
@@ -106,7 +132,6 @@ const ChartRenderer = React.memo(({ zoomedChartData, events, zoom, draggingEvent
   const { handleMouseMove, clearHover: clearGraphHover } = useGraphTooltip(zoomedChartData, events);
   const [animationKey, setAnimationKey] = useState(0);
 
-  // Checksum logic is now inside the memoized component
   const eventsChecksum = useMemo(() => {
     if (!events || events.length === 0) return '0';
     const serializeParams = (params) => {
@@ -123,35 +148,24 @@ const ChartRenderer = React.memo(({ zoomedChartData, events, zoom, draggingEvent
     setAnimationKey(p => p + 1);
   }, [eventsChecksum]);
 
-  const eventMarkers = useMemo(() => {
+  const inflectionAges = useMemo(() => new Set(events.filter(e => e.type === 'financial-phase').map(e => e.age)), [events]);
+
+  // Re-introduce ReferenceLine for the vertical line, but without the problematic label
+  const eventReferenceLines = useMemo(() => {
     return events.filter(event => event.age >= zoom.start && event.age <= zoom.end).map(event => {
       const config = eventRegistry.getConfig(event.type);
       if (!config) return null;
       return (
         <ReferenceLine
-          key={event.id}
+          key={`line-${event.id}`}
           x={event.age}
           stroke={config.color}
-          strokeWidth={draggingEvent?.id === event.id ? 3 : 2}
-          label={(props) => (
-            <MemoizedCustomLabel
-              {...props}
-              value={config.icon}
-              fill={config.color}
-              eventId={event.id}
-              eventData={event}
-              isDragging={draggingEvent?.id === event.id}
-              onDragStart={handleEventDragStart}
-              onEdit={onEditEvent}
-              onRemove={removeEvent}
-            />
-          )}
+          strokeWidth={1}
+          strokeDasharray="3 3"
         />
       );
     });
-  }, [events, zoom, draggingEvent, handleEventDragStart, onEditEvent, removeEvent]);
-
-  const inflectionAges = useMemo(() => new Set(events.filter(e => e.type === 'financial-phase').map(e => e.age)), [events]);
+  }, [events, zoom]);
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -163,15 +177,25 @@ const ChartRenderer = React.memo(({ zoomedChartData, events, zoom, draggingEvent
         </YAxis>
         <Tooltip cursor={{ stroke: '#3b82f6', strokeWidth: 1 }} content={() => null} />
         <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="3 3" />
-        <Line key={animationKey} type="cardinal" tension={0.8} dataKey="netWorth" stroke="#3b82f6" strokeWidth={3} dot={<CustomizedDot inflectionAges={inflectionAges} />} animationDuration={300} animationEasing="ease-out" />
-        {eventMarkers}
+        
+        {eventReferenceLines}
+
+        <Line key={animationKey} type="monotone" dataKey="netWorth" stroke="#3b82f6" strokeWidth={3} dot={<CustomizedDot inflectionAges={inflectionAges} />} animationDuration={300} animationEasing="ease-out" />
+        
+        {/* Invisible line for rendering event marker icons */}
+        <Line 
+          dataKey="netWorth"
+          stroke="none"
+          isAnimationActive={false}
+          dot={<EventMarkerDot events={events} draggingEvent={draggingEvent} handleEventDragStart={handleEventDragStart} onEditEvent={onEditEvent} removeEvent={removeEvent} />}
+        />
       </LineChart>
     </ResponsiveContainer>
   );
 });
 
-function CustomLabel({ viewBox, value, fill, eventId, eventData, isDragging, onDragStart, onEdit, onRemove }) {
-  const { x, y } = viewBox;
+function CustomLabel(props) {
+  const { x, y, value, fill, eventId, eventData, isDragging, onDragStart, onEdit, onRemove } = props;
   const config = eventRegistry.getConfig(eventData.type);
   const { updateHover, clearHover } = useHover();
 
@@ -182,11 +206,12 @@ function CustomLabel({ viewBox, value, fill, eventId, eventData, isDragging, onD
 
   return (
     <g transform={`translate(${x}, ${y})`}>
-      <circle r="16" fill={fill} fillOpacity="0.2" />
-      <circle r="12" fill={fill} fillOpacity="0.3" />
-      <text x={0} y={-10} fill={fill} fontSize={isDragging ? 24 : 20} textAnchor="middle" dominantBaseline="central" aria-label={`Event: ${config.label} at age ${eventData.age}`} style={{ cursor: 'grab', transition: 'font-size 0.2s, filter 0.2s', filter: isDragging ? 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.9))' : 'none' }} onClick={(e) => { if (!isDragging) { e.stopPropagation(); onEdit(eventData); } }} onMouseDown={(e) => { if (e.button === 0) onDragStart(eventData, e); else if (e.button === 1) { e.preventDefault(); onRemove(eventId); } }} onMouseEnter={handleMouseEnter} onMouseLeave={clearHover}>
+      <circle r="16" fill={fill} fillOpacity="0.2" style={{ pointerEvents: 'none' }} />
+      <circle r="12" fill={fill} fillOpacity="0.3" style={{ pointerEvents: 'none' }} />
+      <text x={0} y={0} fill={fill} fontSize={isDragging ? 24 : 20} textAnchor="middle" dominantBaseline="central" aria-label={`Event: ${config.label} at age ${eventData.age}`} style={{ transition: 'font-size 0.2s, filter 0.2s', filter: isDragging ? 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.9))' : 'none', pointerEvents: 'none' }}>
         {value}
       </text>
+      <circle r="20" fill="transparent" style={{ cursor: 'grab' }} onClick={(e) => { if (!isDragging) { e.stopPropagation(); onEdit(eventData); } }} onMouseDown={(e) => { if (e.button === 0) onDragStart(eventData, e); else if (e.button === 1) { e.preventDefault(); onRemove(eventId); } }} onMouseEnter={handleMouseEnter} onMouseLeave={clearHover} />
     </g>
   );
 }
