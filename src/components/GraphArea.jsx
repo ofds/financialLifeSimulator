@@ -1,9 +1,9 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Label } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Label, Dot } from 'recharts';
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { formatCurrency } from '../utils/formatters';
 import { eventRegistry } from '../events/EventRegistry';
-import { useHover } from '../contexts/HoverContext';
 import { useGraphTooltip } from '../hooks/useGraphTooltip';
+import { useHover } from '../contexts/HoverContext';
 
 const MemoizedCustomLabel = React.memo(CustomLabel);
 
@@ -12,7 +12,6 @@ export default function GraphArea({ events, results, addEvent, removeEvent, upda
   const [draggingEvent, setDraggingEvent] = useState(null);
   const [animationKey, setAnimationKey] = useState(0);
   const [zoom, setZoom] = useState({ start: 15, end: 80 });
-  const { updateHover, clearHover: clearEventHover } = useHover();
   const previousEventsRef = useRef(events);
 
   const fullChartData = useMemo(() => {
@@ -26,19 +25,10 @@ export default function GraphArea({ events, results, addEvent, removeEvent, upda
   const { handleMouseMove, clearHover: clearGraphHover } = useGraphTooltip(zoomedChartData, events);
 
   useEffect(() => {
-    const eventsChanged = previousEventsRef.current.length !== events.length ||
-      previousEventsRef.current.some((prevEvent, idx) => {
-        const currentEvent = events[idx];
-        if (!currentEvent) return true;
-        return prevEvent.id !== currentEvent.id || 
-               prevEvent.age !== currentEvent.age ||
-               JSON.stringify(prevEvent.params) !== JSON.stringify(currentEvent.params);
-      });
-
-    if (eventsChanged) {
+    if (previousEventsRef.current !== events) {
       setAnimationKey(prev => prev + 1);
+      previousEventsRef.current = events;
     }
-    previousEventsRef.current = events;
   }, [events]);
 
   const getAgeFromPosition = useCallback((e) => {
@@ -122,14 +112,23 @@ export default function GraphArea({ events, results, addEvent, removeEvent, upda
               onDragStart={handleEventDragStart}
               onEdit={onEditEvent}
               onRemove={removeEvent}
-              onHover={updateHover}
-              onHoverEnd={clearEventHover}
             />
           )}
         />
       );
     });
-  }, [events, draggingEvent, handleEventDragStart, onEditEvent, removeEvent, updateHover, clearEventHover, zoom]);
+  }, [events, draggingEvent, handleEventDragStart, onEditEvent, removeEvent, zoom]);
+
+  const inflectionPoints = useMemo(() => {
+    const phaseEvents = events.filter(e => e.type === 'financial-phase' && e.age > zoom.start && e.age < zoom.end);
+    return phaseEvents.map(event => {
+      const dataPoint = fullChartData.find(d => d.age === event.age);
+      return {
+        ...event,
+        netWorth: dataPoint ? dataPoint.netWorth : 0
+      };
+    });
+  }, [events, fullChartData, zoom]);
 
   return (
     <div
@@ -169,7 +168,8 @@ export default function GraphArea({ events, results, addEvent, removeEvent, upda
 
             <Line
               key={animationKey}
-              type="monotone"
+              type="cardinal"
+              tension={0.8}
               dataKey="netWorth"
               stroke="#3b82f6"
               strokeWidth={3}
@@ -178,23 +178,38 @@ export default function GraphArea({ events, results, addEvent, removeEvent, upda
               animationEasing="ease-out"
             />
 
+            {inflectionPoints.map(p => (
+              <Dot key={`dot-${p.id}`} cx={p.cx} cy={p.cy} r={6} fill="#3b82f6" stroke="#fff" strokeWidth={2} style={{ filter: 'drop-shadow(0 0 5px rgba(59, 130, 246, 0.7))' }} />
+            ))}
+
             {eventMarkers}
           </LineChart>
         </ResponsiveContainer>
 
         {events.length === 0 && <EmptyState />}
       </div>
+       <style>{`
+        .recharts-dot {
+          animation: pulse-dot 1.5s infinite;
+        }
+        @keyframes pulse-dot {
+          0% { transform: scale(1); opacity: 0.7; }
+          50% { transform: scale(1.3); opacity: 1; }
+          100% { transform: scale(1); opacity: 0.7; }
+        }
+      `}</style>
     </div>
   );
 }
 
-function CustomLabel({ viewBox, value, fill, eventId, eventData, isDragging, onDragStart, onEdit, onRemove, onHover, onHoverEnd }) {
+function CustomLabel({ viewBox, value, fill, eventId, eventData, isDragging, onDragStart, onEdit, onRemove }) {
   const { x, y } = viewBox;
   const config = eventRegistry.getConfig(eventData.type);
+  const { updateHover, clearHover } = useHover();
 
   const handleMouseEnter = () => {
     const handler = eventRegistry.getHandler(eventData.type);
-    onHover({
+    updateHover({
       title: config.label,
       type: `Event at Age ${eventData.age}`,
       icon: config.icon,
@@ -239,7 +254,7 @@ function CustomLabel({ viewBox, value, fill, eventId, eventData, isDragging, onD
           }
         }}
         onMouseEnter={handleMouseEnter}
-        onMouseLeave={onHoverEnd}
+        onMouseLeave={clearHover}
       >
         {value}
       </text>

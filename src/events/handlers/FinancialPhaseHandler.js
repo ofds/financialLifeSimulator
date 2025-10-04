@@ -19,7 +19,15 @@ export class FinancialPhaseHandler extends BaseEventHandler {
   }
 
   calculateImmediateImpact(netWorth, eventData, age, allEvents, context) {
-    return eventData.params.startingNetWorth || 0
+    // Only apply starting net worth if this is the very first financial phase event.
+    const isFirstPhase = !allEvents.some(e => e.type === 'financial-phase' && e.age < age);
+    
+    if (isFirstPhase) {
+      return eventData.params.startingNetWorth || 0;
+    }
+    
+    // For subsequent phases, there is no immediate impact on net worth, only a change in growth parameters.
+    return netWorth;
   }
 
   contributeToYearlyGrowth(netWorth, eventData, currentAge, context) {
