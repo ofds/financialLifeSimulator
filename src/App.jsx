@@ -41,14 +41,14 @@ function App() {
         
         <div className="flex-1 flex overflow-hidden">
           <div className="w-[20%]">
-            <InputSidebar 
+            <InputSidebar
               selectedInputType={selectedInputType}
               addEvent={addEvent}
             />
           </div>
-          
+
           <div className="w-[70%] flex flex-col">
-            <GraphArea 
+            <GraphArea
               events={events}
               results={results}
               addEvent={addEvent}
@@ -57,13 +57,13 @@ function App() {
               onEditEvent={setEditingEvent}
               simulationParams={simulationParams}
             />
-            <BottomBar 
+            <BottomBar
               selectedInputType={selectedInputType}
               setSelectedInputType={setSelectedInputType}
             />
           </div>
-          
-          <div className="w-[10%]">
+
+          <div className="w-[20%]">
             <StatsPanel />
           </div>
         </div>

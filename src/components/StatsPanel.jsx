@@ -19,7 +19,7 @@ const StatsPanel = memo(() => {
   }
   
   return (
-    <div className="w-80 bg-slate-800 border-l border-slate-700 p-6">
+    <div className="bg-slate-800 border-l border-slate-700 p-6">
       <h3 className="text-lg font-semibold text-slate-100 mb-4">
         {hoverInfo.title || 'Statistics'}
       </h3>
