@@ -38,6 +38,7 @@ export const retirementConfig = {
   label: 'event.retirement.label',
   icon: '🏖️',
   color: '#0891b2',
+  category: 'Market & Life',
   fields: [
     { name: 'annualWithdrawal', label: 'event.retirement.field.annualWithdrawal.label', type: 'currency', default: 40000 },
     { name: 'monthlyWithdrawal', label: 'event.retirement.field.monthlyWithdrawal.label', type: 'currency', default: 3333 },

@@ -57,6 +57,7 @@ export const houseConfig = {
   label: 'event.house.label',
   icon: '🏠',
   color: '#f59e0b',
+  category: 'Assets',
   fields: [
     { name: 'purchasePrice', label: 'event.house.field.purchasePrice.label', type: 'currency', default: 300000 },
     { name: 'downPayment', label: 'event.house.field.downPayment.label', type: 'percentage', default: 20 },

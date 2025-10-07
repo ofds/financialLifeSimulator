@@ -38,6 +38,7 @@ export const marketEventConfig = {
   label: 'event.market-event.label',
   icon: '📉',
   color: '#4f46e5',
+  category: 'Market & Life',
   fields: [
     { name: 'startAge', label: 'event.market-event.field.startAge.label', type: 'number', default: 40 },
     { name: 'duration', label: 'event.market-event.field.duration.label', type: 'number', default: 2 },

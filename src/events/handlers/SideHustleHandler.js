@@ -46,6 +46,7 @@ export const sideHustleConfig = {
   label: 'event.side-hustle.label',
   icon: '🚀',
   color: '#d946ef',
+  category: 'Income & Growth',
   fields: [
     { name: 'monthlyIncome', label: 'event.side-hustle.field.monthlyIncome.label', type: 'currency', default: 500 },
     { name: 'annualIncome', label: 'event.side-hustle.field.annualIncome.label', type: 'currency', default: 6000 },

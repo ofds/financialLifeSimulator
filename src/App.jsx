@@ -5,6 +5,7 @@ import GraphArea from './components/GraphArea'
 import BottomBar from './components/BottomBar'
 import StatsPanel from './components/StatsPanel'
 import EditEventModal from './components/EditEventModal'
+import AddEventModal from './components/AddEventModal' // Import the new modal
 import { useSimulation } from './hooks/useSimulation'
 import { HoverProvider } from './contexts/HoverContext'
 
@@ -12,6 +13,7 @@ function App() {
   const [selectedInputType, setSelectedInputType] = useState('financial-phase')
   const [darkMode, setDarkMode] = useState(true)
   const [editingEvent, setEditingEvent] = useState(null)
+  const [isAddEventModalOpen, setAddEventModalOpen] = useState(false); // State for the new modal
 
   const {
     events,
@@ -57,10 +59,8 @@ function App() {
               onEditEvent={setEditingEvent}
               simulationParams={simulationParams}
             />
-            <BottomBar
-              selectedInputType={selectedInputType}
-              setSelectedInputType={setSelectedInputType}
-            />
+            {/* Updated BottomBar */}
+            <BottomBar onAddEventClick={() => setAddEventModalOpen(true)} />
           </div>
 
           <div className="w-[20%]">
@@ -77,6 +77,13 @@ function App() {
             onDelete={removeEvent}
           />
         )}
+
+        {/* Add Event Modal */}
+        <AddEventModal
+          isOpen={isAddEventModalOpen}
+          onClose={() => setAddEventModalOpen(false)}
+          onSelectEventType={setSelectedInputType}
+        />
       </div>
     </HoverProvider>
   )

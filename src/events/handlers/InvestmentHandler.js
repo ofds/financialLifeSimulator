@@ -40,6 +40,7 @@ export const investmentConfig = {
   label: 'event.investment.label',
   icon: '📈',
   color: '#14b8a6',
+  category: 'Income & Growth',
   fields: [
     { name: 'amount', label: 'event.investment.field.amount.label', type: 'currency', default: 25000 },
     { name: 'returnRate', label: 'event.investment.field.returnRate.label', type: 'percentage', default: 10 },

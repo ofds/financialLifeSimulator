@@ -39,6 +39,7 @@ export const incomePulseConfig = {
   label: 'event.outstanding-income.label',
   icon: '💰',
   color: '#8b5cf6',
+  category: 'Income & Growth',
   fields: [
     { name: 'amount', label: 'event.outstanding-income.field.amount.label', type: 'currency', default: 50000 }
   ]

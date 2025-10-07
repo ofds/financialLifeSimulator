@@ -33,5 +33,6 @@ export const largeExpenseConfig = {
   label: 'event.large-expense.label',
   icon: '💸',
   color: '#ef4444',
+  category: 'Major Expenses',
   fields: [{ name: 'amount', label: 'event.large-expense.field.amount.label', type: 'currency', default: 10000 }],
 };

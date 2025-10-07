@@ -49,6 +49,7 @@ export const studentLoanConfig = {
   label: 'event.student-loan.label',
   icon: '🎓',
   color: '#10b981',
+  category: 'Major Expenses',
   fields: [
     { name: 'loanAmount', label: 'event.student-loan.field.loanAmount.label', type: 'currency', default: 40000 },
     { name: 'interestRate', label: 'event.student-loan.field.interestRate.label', type: 'percentage', default: 5 },

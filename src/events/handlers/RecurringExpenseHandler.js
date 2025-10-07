@@ -41,6 +41,7 @@ export const recurringExpenseConfig = {
   label: 'event.recurring-expense.label',
   icon: '🧾',
   color: '#f97316',
+  category: 'Major Expenses',
   fields: [
     { name: 'amount', label: 'event.recurring-expense.field.amount.label', type: 'currency', default: 100 },
     { name: 'frequency', label: 'event.recurring-expense.field.frequency.label', type: 'select', options: ['monthly', 'annually'], default: 'monthly' },

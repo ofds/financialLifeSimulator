@@ -67,6 +67,7 @@ export const financialPhaseConfig = {
   label: 'event.financial-phase.label',
   icon: '📊',
   color: '#3b82f6',
+  category: 'Core',
   fields: [
     { name: 'startingNetWorth', label: 'event.financial-phase.field.startingNetWorth.label', type: 'currency', default: 0 },
     { name: 'annualIncome', label: 'event.financial-phase.field.annualIncome.label', type: 'currency', default: 50000 },

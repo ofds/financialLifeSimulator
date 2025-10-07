@@ -59,6 +59,7 @@ export const carPurchaseConfig = {
   label: 'event.car-purchase.label',
   icon: '🚗',
   color: '#9333ea',
+  category: 'Assets',
   fields: [
     { name: 'purchasePrice', label: 'event.car-purchase.field.purchasePrice.label', type: 'currency', default: 25000 },
     { name: 'downPayment', label: 'event.car-purchase.field.downPayment.label', type: 'currency', default: 5000 },
