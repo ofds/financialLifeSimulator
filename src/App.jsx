@@ -59,8 +59,8 @@ function App() {
               onEditEvent={setEditingEvent}
               simulationParams={simulationParams}
             />
-            {/* Updated BottomBar */}
-            <BottomBar onAddEventClick={() => setAddEventModalOpen(true)} />
+           
+            <BottomBar onSelectEventType={setSelectedInputType} />
           </div>
 
           <div className="w-[20%]">
